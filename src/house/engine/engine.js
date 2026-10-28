@@ -73,6 +73,8 @@ export class GameEngine {
         e.preventDefault()
       }
       if (e.code === 'Escape' || e.code === 'KeyP') this.onUi({ type: 'pauseRequest' })
+      // O: he dreams, now or as soon as he is still (to try the architects' dreams)
+      if (e.code === 'KeyO') this.wantDream = true
       if (this.settings.debug) {
         if (e.code === 'KeyC') this.game.debugCollision()
         if (e.code === 'KeyE') this.game.debugEvaluate()
@@ -194,6 +196,7 @@ export class GameEngine {
     const t = tilt.read(sensors.active ? sensors.gravity : null, dt)
     this.input = { tilt: t, motion: sensors.active ? sensors.motion : 0, sensitivity: this.settings.sensitivity }
     g.update(dt, this.input)
+    if (this.wantDream && (g.dream || g.status !== 'playing' || g.debugDream())) this.wantDream = false
     for (const e of g.drain()) this.handle(e)
     // a new stage or a restart begins with him asleep: keep sound and Zs in step with the game
     if (this.fx.sleep !== g.sleep.state) {
