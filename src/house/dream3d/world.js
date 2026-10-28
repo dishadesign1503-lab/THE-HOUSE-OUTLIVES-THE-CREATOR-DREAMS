@@ -115,6 +115,21 @@ function marbleTexture(base, vein, seed) {
   })
 }
 
+// Hadid's floor: pale resin, swept by long curving lines
+function flowTexture() {
+  return canvasTexture([512, 512], (g, w, h) => {
+    g.fillStyle = '#e9e8e4'
+    g.fillRect(0, 0, w, h)
+    g.strokeStyle = 'rgba(70,72,84,0.22)'
+    g.lineWidth = 2
+    for (let k = 0; k < 9; k++) {
+      g.beginPath()
+      for (let x = 0; x <= w; x += 8) g.lineTo(x, ((k + 0.5) * h) / 9 + 18 * Math.sin((2 * Math.PI * x) / w + k * 0.7))
+      g.stroke()
+    }
+  })
+}
+
 function glowTexture() {
   return canvasTexture(
     [128, 128],
@@ -154,12 +169,21 @@ function materials() {
     onyx: std({ map: marbleTexture('#c8924f', '#fff1d0', 3), roughness: 0.15, metalness: 0.05 }),
     marble: std({ map: marbleTexture('#2f4a3c', '#d9e8dc', 11), roughness: 0.12, metalness: 0.05 }),
     travertineWall: std({ map: gridTexture('#d8cdb5', 'rgba(0,0,0,0.12)', true), roughness: 0.6 }),
+    fluid: std({ color: '#f1f0ec', roughness: 0.22, metalness: 0.05 }),
+    fluidCeiling: std({ color: '#eceae6', roughness: 0.3, side: THREE.FrontSide }),
+    titanium: std({ color: '#c3c9cf', roughness: 0.35, metalness: 0.6, flatShading: true }),
+    copper: std({ color: '#b5683a', roughness: 0.4, metalness: 0.5, flatShading: true }),
+    ply: std({ map: gridTexture('#c49a6c', 'rgba(70,35,0,0.35)', true), roughness: 0.8 }),
+    plyCeiling: std({ map: gridTexture('#c49a6c', 'rgba(70,35,0,0.35)', true), roughness: 0.8, side: THREE.FrontSide }),
   }
 }
 
 function floorMaterial(kind) {
   if (kind === 'hex') return { mat: new THREE.MeshStandardMaterial({ map: hexTexture(), roughness: 0.55 }), tile: [0.7, (0.7 * 3) / Math.sqrt(3)] }
   if (kind === 'concrete') return { mat: new THREE.MeshStandardMaterial({ map: gridTexture('#b9bbb8', 'rgba(0,0,0,0.18)'), roughness: 0.9 }), tile: [0.6, 0.6] }
+  if (kind === 'flow') return { mat: new THREE.MeshStandardMaterial({ map: flowTexture(), roughness: 0.2 }), tile: [2.4, 2.4] }
+  // Gehry's: rough boards
+  if (kind === 'boards') return { mat: new THREE.MeshStandardMaterial({ map: gridTexture('#a77d50', 'rgba(40,20,0,0.35)', true), roughness: 0.85 }), tile: [1.2, 0.3] }
   return { mat: new THREE.MeshStandardMaterial({ map: gridTexture('#e3d9c2', 'rgba(90,70,40,0.25)', true), roughness: 0.4 }), tile: [1, 0.5] }
 }
 
@@ -276,6 +300,9 @@ function column(c, mats) {
       m.position.y = c.h / 2
       g.add(m)
     }
+  } else if (c.shape === 'lean') {
+    // a post knocked off the vertical (Gehry)
+    g.add(cylinderBetween(new THREE.Vector3(0, 0, 0), new THREE.Vector3(c.lx, c.h, c.lz), c.r, c.r * 0.7, mat))
   } else if (c.shape === 'mullion') {
     const m = new THREE.Mesh(new THREE.BoxGeometry(0.03, c.h, 0.03), mat)
     m.position.y = c.h / 2
@@ -295,7 +322,19 @@ function ceiling(cl, mats, seed) {
   const w = cl.x1 - cl.x0
   const d = cl.y1 - cl.y0
   const vault = cl.kind === 'vault'
-  const g = new THREE.PlaneGeometry(w, d, vault ? 14 : 1, vault ? 14 : 1).rotateX(Math.PI / 2)
+  const wave = cl.kind === 'wave'
+  const g = new THREE.PlaneGeometry(w, d, vault ? 14 : wave ? Math.ceil(w * 6) : 1, vault ? 14 : wave ? Math.ceil(d * 6) : 1).rotateX(Math.PI / 2)
+  if (wave) {
+    // one sheet rippling along the current (Hadid), its crests drifting across it
+    const p = g.attributes.position
+    const [cx, cz] = [Math.cos(cl.dir), Math.sin(cl.dir)]
+    for (let i = 0; i < p.count; i++) {
+      const a = p.getX(i) * cx + p.getZ(i) * cz
+      const c = p.getZ(i) * cx - p.getX(i) * cz
+      p.setY(i, cl.rise * Math.sin(a * 1.6 + 0.6 * Math.sin(c * 0.9)))
+    }
+    g.computeVertexNormals()
+  }
   if (vault) {
     // a catenary, upside down: rising to the middle of the bay
     const p = g.attributes.position
@@ -316,6 +355,8 @@ function ceiling(cl, mats, seed) {
   }
   const m = new THREE.Mesh(g, mats[cl.mat])
   m.position.set((cl.x0 + cl.x1) / 2, cl.y, (cl.y0 + cl.y1) / 2)
+  // a plane tilted its own way (Gehry)
+  if (cl.kind === 'tilt') m.rotation.set(cl.tx, 0, cl.tz)
   return m
 }
 

@@ -1,4 +1,4 @@
-// THE ARCHITECT HE DREAMS HE IS — three ways of rebuilding the same plan.
+// THE ARCHITECT HE DREAMS HE IS — five ways of rebuilding the same plan.
 //
 // He hears and cannot see, so he dreams with his body: he declares himself an architect, and the
 // house is rebuilt in that architect's spatial language. The source is always the present plan
@@ -6,7 +6,7 @@
 // the same description, which the 3D dream (world.js) builds and walks:
 //   walls      ribbons along a path, morphing from the plan's straight wall (k = 0) to the dream (k = 1)
 //   columns    on the grid's crossings, growing out of the floor
-//   ceilings   flat slabs or vaults over the bays (seen from below only: a cut-away from above)
+//   ceilings   slabs, vaults, a rippling sheet or tilted planes (seen from below only: a cut-away from above)
 //   floor      the architect's paving, and anything outside (Mies's pool)
 // The anchor must stay reachable, as in the 2D dream: if a rebuilt house blocks every way to it,
 // the dream is rebuilt more gently (dreamHouse), down to the plan itself.
@@ -93,6 +93,18 @@ function planWall(w, mat) {
   return { id: w.id, kind: w.kind, pts0: pts, pts1: pts, bot0: 0, bot1: 0, top0: WALL_H, top1: WALL_H, thick0: w.thick, thick1: w.thick, mat, solid: true }
 }
 
+// a folded line through the knots [t, value], t from 0 to 1
+function folded(knots) {
+  return (t) => {
+    for (let i = 1; i < knots.length; i++) {
+      const [t0, v0] = knots[i - 1]
+      const [t1, v1] = knots[i]
+      if (t <= t1) return lerp(v0, v1, clamp((t - t0) / (t1 - t0 || 1)))
+    }
+    return knots[knots.length - 1][1]
+  }
+}
+
 // columns stand clear of the walls, of the player and of the anchor
 function clearSpot(c, walls, keep, r) {
   if (keep.some((k) => Math.hypot(c.x - k.x, c.y - k.y) < k.r)) return false
@@ -103,7 +115,7 @@ function clearSpot(c, walls, keep, r) {
   return true
 }
 
-// ---------- the three architects ----------
+// ---------- the five architects ----------
 
 export const ARCHITECTS = {
   gaudi: {
@@ -252,6 +264,129 @@ export const ARCHITECTS = {
       return { walls, columns, ceilings, floor: 'travertine', extras }
     },
   },
+
+  hadid: {
+    id: 'hadid',
+    name: 'ZAHA HADID',
+    years: '1950 – 2016',
+    declaration: 'I AM ZAHA HADID.',
+    motto: 'There are 360 degrees, so why stick to one?',
+    principles: ['No corner survives: every wall sweeps into one long curve.', 'All the walls lean into the same current.', 'They rise as they run, like a wave about to break.', 'One ceiling ripples over everything, and no column interrupts it.'],
+    accent: '#7af0ff',
+    look: { background: '#0b0c10', fog: '#15171d', sky: '#f4f6ff', ground: '#1e2028', sun: '#ffffff', sunAt: [-6, 9, -2], fogNear: 3, fogFar: 18 },
+    build(plan, s) {
+      // the current every wall is swept by, read from the dream's seed
+      const flow = hash('flow', plan.seed) * Math.PI * 2
+      const F = P(Math.cos(flow), Math.sin(flow))
+      const walls = plan.walls.map((w) => {
+        const e = planWall(w, 'fluid')
+        const n = e.pts0.length
+        const L = len(w)
+        const u = P((w.b.x - w.a.x) / L, (w.b.y - w.a.y) / L)
+        if (w.kind === 'interior') {
+          // one sweep, bowed downstream, its crest drifting with the current; the ends held, so
+          // the junctions stay joined
+          const down = u.x * F.x + u.y * F.y >= 0
+          const sg = -u.y * F.x + u.x * F.y < 0 ? -1 : 1
+          const lean = down ? 0.7 : -0.7
+          const A = s * Math.min(0.4, 0.22 * L + 0.05) * sg
+          e.pts1 = bend(e.pts0, w.a, w.b, (t) => A * Math.sin(Math.PI * t) * (1 + lean * (2 * t - 1)))
+          e.top1 = e.pts0.map((_, i) => {
+            const d = down ? i / (n - 1) : 1 - i / (n - 1)
+            return WALL_H * (1 + s * (0.3 * d * d * (3 - 2 * d) - 0.12))
+          })
+          e.thick1 = w.thick * 1.25
+        } else if (w.kind === 'shell' || w.kind === 'glass') {
+          // the facade swells outward in a single arc, from corner to corner
+          const A = s * Math.min(0.45, 0.18 * L) * outwardSign(plan, w.a, w.b)
+          e.pts1 = bend(e.pts0, w.a, w.b, (t) => A * Math.sin(Math.PI * t))
+          e.top1 = e.pts0.map((_, i) => WALL_H * (1.05 + 0.15 * s * Math.sin((Math.PI * i) / (n - 1))))
+          if (w.kind === 'glass') Object.assign(e, { mat: 'glass', thick1: 0.06 })
+        }
+        return e
+      })
+      // one continuous sheet over the whole house, rippling along the current
+      const b = bounds(plan)
+      const ceilings = [{ kind: 'wave', x0: b.x0 - 0.6, y0: b.y0 - 0.6, x1: b.x1 + 0.6, y1: b.y1 + 0.6, y: WALL_H * 1.12, rise: 0.18 * s, dir: flow, mat: 'fluidCeiling' }]
+      return { walls, columns: [], ceilings, floor: 'flow', extras: [] }
+    },
+  },
+
+  gehry: {
+    id: 'gehry',
+    name: 'FRANK GEHRY',
+    years: 'born 1929',
+    declaration: 'I AM FRANK GEHRY.',
+    motto: 'Architecture should speak of its time and place, but yearn for timelessness.',
+    principles: ['Every wall folds and breaks into facets.', 'Nothing stands straight: planes tilt, and crash past each other.', 'The skin is crumpled metal, catching the light.', 'Raw plywood inside, as if the house were never finished.'],
+    accent: '#d4d9de',
+    look: { background: '#1b1612', fog: '#2a221c', sky: '#e8eef4', ground: '#3a3128', sun: '#fff0dc', sunAt: [7, 6, 4], fogNear: 3, fogFar: 17 },
+    build(plan, s, keep) {
+      const walls = plan.walls.map((w) => {
+        const h = hash(w.id, plan.seed)
+        const r = (i) => hash(w.id, plan.seed + 11 + i)
+        const e = planWall(w, 'ply')
+        const n = e.pts0.length
+        const L = len(w)
+        const u = P((w.b.x - w.a.x) / L, (w.b.y - w.a.y) / L)
+        if (w.kind === 'interior') {
+          // one or two folds, and the wall overshoots one of its ends, past the wall it meets (an end
+          // that meets no wall is the edge of an opening, and stays)
+          const f = 1 + Math.floor(h * 2)
+          const A = s * Math.min(0.32, 0.2 * L + 0.04)
+          const knots = [[0, 0]]
+          const tops = [[0, WALL_H * (0.95 + 0.45 * r(0))]]
+          for (let i = 1; i <= f; i++) {
+            const t = (i - 0.5 + (r(i) - 0.5) * 0.5) / f
+            knots.push([t, A * (i % 2 ? 1 : -1) * (0.5 + 0.5 * r(i + 4))])
+            tops.push([t, WALL_H * (0.95 + 0.45 * r(i + 8))])
+          }
+          knots.push([1, 0])
+          tops.push([1, WALL_H * (0.95 + 0.45 * r(20))])
+          const ext = s * (0.15 + 0.25 * r(21))
+          const meets = (p) => plan.walls.some((o) => o !== w && distToSegment(p, o.a, o.b) < 0.05)
+          const [ea, eb] = h < 0.5 ? [meets(w.a) ? ext : 0, 0] : [0, meets(w.b) ? ext : 0]
+          const a1 = P(w.a.x - u.x * ea, w.a.y - u.y * ea)
+          const b1 = P(w.b.x + u.x * eb, w.b.y + u.y * eb)
+          e.pts1 = bend(resample(a1, b1, n), a1, b1, folded(knots))
+          const top = folded(tops)
+          e.top1 = e.pts0.map((_, i) => lerp(WALL_H, top(i / (n - 1)), s))
+          e.thick1 = 0.12
+          e.mat = ['ply', 'copper', 'titanium'][Math.floor(h * 9) % 3]
+        } else if (w.kind === 'shell' || w.kind === 'glass') {
+          // a crumpled skin: facets kinked outward, its top line jagged
+          const m = Math.max(2, Math.round(L / 0.75))
+          const A = s * Math.min(0.35, 0.15 * L) * outwardSign(plan, w.a, w.b)
+          const knots = []
+          const tops = []
+          for (let i = 0; i <= m; i++) {
+            const inner = i > 0 && i < m
+            knots.push([i / m, inner ? A * (i % 2 ? 0.4 + 0.6 * r(i) : 0.15 * r(i)) : 0])
+            tops.push([i / m, WALL_H * (inner ? 1.1 + 0.5 * r(i + 30) : 1.1)])
+          }
+          e.pts1 = bend(e.pts0, w.a, w.b, folded(knots))
+          const top = folded(tops)
+          e.top1 = e.pts0.map((_, i) => lerp(WALL_H, top(i / (n - 1)), s))
+          if (w.kind === 'glass') Object.assign(e, { mat: 'glass', thick1: 0.06 })
+          else e.mat = 'titanium'
+        }
+        return e
+      })
+      // posts that lean, each its own way
+      const columns = []
+      if (s >= 0.6) {
+        for (const c of crossings(plan)) {
+          const a = hash(`${c.x},${c.y}`, plan.seed) * Math.PI * 2
+          if (clearSpot(c, walls, keep, 0.2)) columns.push({ ...c, r: 0.07, h: WALL_H * 1.1, shape: 'lean', lx: 0.16 * Math.cos(a), lz: 0.16 * Math.sin(a), mat: 'titanium' })
+        }
+      }
+      // a plywood plane over every bay, each tilted its own way
+      const ceilings = plan.bays
+        .filter((b) => b.room && b.type !== 'court')
+        .map((b) => ({ ...b, kind: 'tilt', y: WALL_H * 1.15, tx: s * (hash(`${b.x0},${b.y0}`, plan.seed) - 0.5) * 0.36, tz: s * (hash(`${b.x1},${b.y1}`, plan.seed) - 0.5) * 0.36, mat: 'plyCeiling' }))
+      return { walls, columns, ceilings, floor: 'boards', extras: [] }
+    },
+  },
 }
 
 // which architect he becomes: his own choice, read from the dream's seed (?architect=gaudi to test)
@@ -371,7 +506,7 @@ export function dreamHouse(plan, architect) {
     }
     // the anchor tile (0.6 × 0.6) must have a cell the player can stand in
     const ok = anchor && [-0.2, 0, 0.2].some((dx) => [-0.2, 0, 0.2].some((dy) => reach[grid.cellOf(P(anchor.x + dx, anchor.y + dy))]))
-    if (ok || s === 0) return { house, start, anchor: anchor ?? start, strength: s }
+    if (ok || s === 0) return { house, start, anchor: anchor ?? start, strength: s, reachable: !!ok }
   }
   return null
 }
