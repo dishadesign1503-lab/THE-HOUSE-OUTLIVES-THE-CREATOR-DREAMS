@@ -1,0 +1,5 @@
+{
+  "_readme": "Optional recordings. Put audio files in this folder and list them here. Anything not listed is synthesised. Keys must match the names in src/daemon/voice/soundEngine.js.",
+  "loops": {},
+  "oneshots": {}
+}

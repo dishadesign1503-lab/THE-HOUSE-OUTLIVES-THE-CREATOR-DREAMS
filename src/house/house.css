@@ -1,0 +1,1109 @@
+/* THE HOUSE OUTLIVES ITS CREATOR — a drawing, not a dashboard. */
+
+.hs-root {
+  --bg: #09090b;
+  --ink: #f2f0ea;
+  --dim: rgba(242, 240, 234, 0.55);
+  --line: rgba(242, 240, 234, 0.28);
+  --body: #ff5b3a;
+  --blue: #2a6bff;
+  --red: #ff3b30;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hs-root *,
+.hs-root *::before,
+.hs-root *::after {
+  box-sizing: border-box;
+}
+
+.hs-screen {
+  height: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hs-title {
+  justify-content: center;
+}
+
+.hs-title h1 {
+  font-weight: 400;
+  font-size: clamp(1.7rem, 8vw, 2.4rem);
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.hs-subtitle {
+  font-style: italic;
+  color: var(--dim);
+  margin: 0 0 1rem;
+}
+
+.hs-title-plan .hs-sleeper {
+  transform-origin: 60px 60px;
+  animation: hs-breathe 6s ease-in-out infinite;
+}
+
+.hs-title-plan .hs-glide {
+  animation: hs-glide 9s ease-in-out infinite;
+}
+
+@keyframes hs-breathe {
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes hs-glide {
+  45%,
+  60% {
+    transform: translate(3px, -5px);
+  }
+}
+
+h2 {
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+h3 {
+  font-weight: 400;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 0 0 0.4rem;
+}
+
+.hs-dim {
+  color: var(--dim);
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.center {
+  text-align: center;
+  justify-content: center;
+}
+
+.hs-ok,
+.hs-status .ok {
+  color: #9fd8a6;
+}
+
+.hs-status .warn {
+  color: #ffb4a3;
+}
+
+.hs-status {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+
+.hs-rules {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.hs-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.hs-actions.row {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.hs-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* buttons: thin outlines, like the plan */
+.hs-btn {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0.85rem 1rem;
+  min-height: 44px;
+  text-align: left;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hs-btn:active {
+  background: rgba(242, 240, 234, 0.08);
+}
+
+.hs-btn:focus-visible,
+.hs-toggle:focus-visible,
+.hs-pause:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.hs-btn.primary {
+  border-color: var(--ink);
+}
+
+.hs-btn.ghost {
+  border-color: transparent;
+  color: var(--dim);
+}
+
+.hs-btn.small {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.hs-btn.tiny {
+  padding: 0.25rem 0.5rem;
+  min-height: 30px;
+  font-size: 0.72rem;
+}
+
+.hs-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.hs-toggle {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.8rem;
+  min-height: 44px;
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.hs-toggle .hs-toggle-state {
+  color: var(--dim);
+  min-width: 2em;
+}
+
+.hs-toggle.on {
+  border-color: var(--ink);
+}
+
+.hs-toggle.on .hs-toggle-state {
+  color: var(--blue);
+}
+
+.hs-toggle:disabled {
+  opacity: 0.35;
+}
+
+.hs-slider {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.6rem 0;
+}
+
+.hs-slider-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.hs-slider input {
+  width: 100%;
+  accent-color: var(--blue);
+  height: 28px;
+}
+
+.hs-settings section {
+  border-top: 1px solid var(--line);
+  padding: 0.9rem 0 0.4rem;
+}
+
+.hs-settings p {
+  margin: 0 0 0.5rem;
+}
+
+.hs-meter {
+  position: relative;
+  height: 6px;
+  border: 1px solid var(--line);
+  margin: 0.7rem 0 0.2rem;
+}
+
+.hs-meter div {
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.1s linear;
+}
+
+.hs-meter i {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--body);
+}
+
+/* calibration */
+.hs-tiltbox {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0.5rem auto;
+}
+
+.hs-tiltring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.hs-tiltring::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.hs-tiltdot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 8px rgba(42, 107, 255, 0.2);
+}
+
+.hs-fallback {
+  border: 1px dashed var(--line);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* the game */
+.hs-game {
+  display: flex;
+  flex-direction: column;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: none;
+}
+
+.hs-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 48px;
+  padding: 0 0.75rem;
+  flex: none;
+}
+
+.hs-hud-left,
+.hs-hud-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hs-stage {
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+
+.hs-breath {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--body);
+  transition: transform 0.12s linear;
+}
+
+.hs-breath {
+  background: var(--body);
+}
+
+.hs-breath.red {
+  background: var(--body);
+  box-shadow: 0 0 0 3px rgba(255, 91, 58, 0.25);
+}
+
+.hs-still {
+  color: var(--body);
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+}
+
+.hs-chip {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line);
+  padding: 0.1rem 0.35rem;
+  color: var(--dim);
+}
+
+.hs-chip.fallback {
+  border-style: dashed;
+  color: #ffd38a;
+}
+
+.hs-chip.dim {
+  opacity: 0.6;
+}
+
+/* the sound toggle in the game header: a chip you can tap */
+.hs-chip-btn {
+  font-family: inherit;
+  background: transparent;
+  cursor: pointer;
+  min-height: 2rem;
+}
+
+.hs-pause {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  width: 44px;
+  height: 36px;
+  font-size: 0.7rem;
+  letter-spacing: -0.1em;
+  cursor: pointer;
+}
+
+.hs-board {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.hs-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.hs-message {
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.hs-line {
+  margin: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  animation: hs-fade 4.2s ease forwards;
+}
+
+@keyframes hs-fade {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.hs-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 9, 11, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 5;
+}
+
+.hs-card {
+  width: 100%;
+  max-width: 26rem;
+  max-height: 100%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.hs-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hs-card p {
+  margin: 0;
+}
+
+.hs-numeral {
+  color: var(--dim);
+  letter-spacing: 0.3em;
+}
+
+.hs-more summary {
+  cursor: pointer;
+  color: var(--dim);
+  padding: 0.5rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.hs-ending {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(9, 9, 11, 0.97) 75%, rgba(9, 9, 11, 0));
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 0 auto;
+  z-index: 4;
+  animation: hs-rise 1.4s ease both;
+}
+
+.hs-ending p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+
+.hs-ending .hs-last {
+  color: var(--ink);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin-top: 0.4rem;
+}
+
+@keyframes hs-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.hs-debug {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: calc(50px + env(safe-area-inset-top));
+  font-size: 0.6rem;
+  line-height: 1.35;
+  background: rgba(9, 9, 11, 0.88);
+  border: 1px solid var(--line);
+  padding: 0.35rem 1.8rem 0.35rem 0.5rem;
+  z-index: 3;
+}
+
+.hs-debug .hs-row {
+  margin-top: 0.25rem;
+  gap: 0.35rem;
+}
+
+.hs-debug-close,
+.hs-debug-tab {
+  font: inherit;
+  color: var(--dim);
+  background: rgba(9, 9, 11, 0.88);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.hs-debug-close {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 28px;
+  height: 28px;
+}
+
+.hs-debug-tab {
+  position: absolute;
+  left: 0.5rem;
+  top: calc(52px + env(safe-area-inset-top));
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-title-plan .hs-sleeper,
+  .hs-title-plan .hs-glide,
+  .hs-ending,
+  .hs-line {
+    animation: none;
+  }
+}
+
+.hs-tabs .hs-btn.on {
+  border-color: var(--ink);
+}
+
+.hs-bar {
+  display: grid;
+  grid-template-columns: 9.5em 1fr 3em;
+  gap: 0.4em;
+  align-items: center;
+}
+
+.hs-bar i {
+  display: block;
+  height: 4px;
+  background: var(--dim);
+}
+
+.hs-bar i.accent {
+  background: var(--body);
+}
+
+.hs-bar b {
+  font-weight: 400;
+  text-align: right;
+}
+
+.hs-debug {
+  max-height: 55%;
+  overflow-y: auto;
+}
+
+/* the hypnotic instruction: one microphone button under the plan, a typed fallback */
+.hs-hypno {
+  flex: none;
+  padding: 0.25rem 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hs-hypno-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+}
+
+.hs-mic {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: none;
+  transition: box-shadow 0.08s linear, border-color 0.2s;
+}
+
+.hs-mic:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.hs-mic.recording {
+  border-color: var(--body);
+  color: var(--body);
+}
+
+.hs-mic.loading,
+.hs-mic.recognizing {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.hs-mic:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.hs-hypno-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hs-hypno-label.recording {
+  color: var(--body);
+  text-transform: uppercase;
+}
+
+.hs-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--body);
+  animation: hs-rec 1s ease-in-out infinite;
+}
+
+@keyframes hs-rec {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-rec-dot {
+    animation: none;
+  }
+}
+
+/* HYPNOTIZE: the button, the popup (a sheet over the lower part of the plan), the words */
+.hs-hypnotize {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.12em;
+  border-color: var(--blue);
+  color: var(--ink);
+  padding: 0.6rem 1rem;
+}
+
+.hs-hypno {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.75rem 0;
+}
+
+.hs-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: linear-gradient(to bottom, rgba(9, 9, 11, 0) 30%, rgba(9, 9, 11, 0.7));
+}
+
+.hs-sheet-card {
+  width: 100%;
+  max-width: 520px;
+  max-height: 72vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hs-sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hs-sheet-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+}
+
+.hs-sheet-em {
+  margin: 0;
+  font-style: italic;
+}
+
+.hs-sheet-examples {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.hs-sheet-examples li {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--line);
+  padding: 0.15rem 0.4rem;
+  color: var(--dim);
+}
+
+.hs-speak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  border-color: var(--blue);
+  min-height: 56px;
+}
+
+.hs-rec {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 56px;
+  border: 1px solid var(--body);
+  padding: 0 0.6rem;
+}
+
+.hs-rec-text {
+  color: var(--body);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  flex: 1;
+}
+
+.hs-meter {
+  width: 60px;
+  height: 4px;
+  background: var(--line);
+  position: relative;
+}
+
+.hs-meter span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--body);
+}
+
+.hs-sheet-status {
+  margin: 0;
+  color: var(--dim);
+}
+
+.hs-sheet-status.ok {
+  color: var(--ink);
+}
+
+.hs-sheet-error {
+  border: 1px solid var(--body);
+  padding: 0.5rem 0.6rem;
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.hs-sheet-error p {
+  margin: 0.15rem 0;
+}
+
+.hs-sheet-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--dim);
+}
+
+.hs-warn {
+  color: var(--body);
+}
+
+.hs-trance {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.hs-trance p {
+  margin: 0 auto;
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  background: rgba(9, 9, 11, 0.6);
+  font-size: clamp(1rem, 5vw, 1.5rem);
+  letter-spacing: 0.18em;
+  color: var(--ink);
+  text-shadow: 0 0 12px rgba(42, 107, 255, 0.8);
+  animation: hs-trance-in 2.8s ease-out both;
+}
+
+.hs-trance span {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.hs-trance i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+}
+
+.hs-trance i.on {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+@keyframes hs-trance-in {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.4em;
+  }
+  15% {
+    opacity: 1;
+    letter-spacing: 0.18em;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-trance p {
+    animation: none;
+  }
+}
+
+/* "Ohh no... He's dreaming!" — briefly, with a glitch */
+.hs-dream-banner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38%;
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hs-dream-banner p {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: rgba(9, 9, 11, 0.75);
+  color: #ffd9a8;
+  font-size: clamp(1.1rem, 5.5vw, 1.7rem);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 14px rgba(255, 160, 70, 0.7);
+  animation: hs-dream-in 2.8s ease-out both, hs-flicker 0.9s steps(1) 2;
+}
+
+.hs-dream-banner p::before,
+.hs-dream-banner p::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0.5rem 1rem;
+  pointer-events: none;
+}
+
+.hs-dream-banner p::before {
+  color: rgba(255, 91, 58, 0.7);
+  animation: hs-glitch-a 0.6s steps(2) 3;
+  clip-path: inset(0 0 55% 0);
+}
+
+.hs-dream-banner p::after {
+  color: rgba(42, 107, 255, 0.7);
+  animation: hs-glitch-b 0.6s steps(2) 3;
+  clip-path: inset(50% 0 0 0);
+}
+
+@keyframes hs-dream-in {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hs-flicker {
+  0%,
+  40%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  60% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes hs-glitch-a {
+  0% {
+    transform: translate(-3px, 0);
+  }
+  50% {
+    transform: translate(3px, -1px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes hs-glitch-b {
+  0% {
+    transform: translate(3px, 1px);
+  }
+  50% {
+    transform: translate(-2px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-dream-banner p,
+  .hs-dream-banner p::before,
+  .hs-dream-banner p::after {
+    animation: none;
+  }
+}
+
+/* THE WARNING after Start: typed letter by letter on near-black, then a fade into the game */
+.hs-disclaimer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2rem 1.25rem;
+  background: #050506;
+  cursor: pointer;
+  animation: hs-warn-in 1.2s ease;
+  transition: opacity 0.9s ease;
+}
+
+@keyframes hs-warn-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.hs-disclaimer.leaving {
+  opacity: 0;
+}
+
+.hs-disclaimer-text {
+  max-width: 30rem;
+  min-height: 9em;
+  margin: 0;
+  font-size: clamp(1rem, 4.2vw, 1.25rem);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  white-space: pre-line;
+  color: var(--ink);
+  text-shadow: 0 0 12px rgba(255, 91, 58, 0.18);
+}
+
+.hs-disclaimer-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 0.1em;
+  vertical-align: -0.15em;
+  background: var(--ink);
+  opacity: 0.8;
+}
+
+.hs-disclaimer-caret.idle {
+  animation: hs-caret 1.1s steps(1) infinite;
+}
+
+@keyframes hs-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hs-disclaimer-skip {
+  margin: 0;
+  letter-spacing: 0.08em;
+}
+
+.hs-disclaimer-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-disclaimer,
+  .hs-disclaimer-caret.idle {
+    animation: none;
+  }
+}

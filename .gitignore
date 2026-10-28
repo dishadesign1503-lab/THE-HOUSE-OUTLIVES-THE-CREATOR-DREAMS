@@ -1,0 +1,39 @@
+# packages and the built site (GitHub rebuilds both)
+node_modules
+dist
+dist-ssr
+.vite
+*.tsbuildinfo
+.cache
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# keys and passwords
+.env
+.env.*
+!.env.example
+*.local
+*.pem
+*.key
+
+# editors and operating systems
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# the city kit of the earlier Weimar: Hot & Cold project (not part of this release; kept locally)
+public/data/
+
+# test screenshots and scratch output
+shots
+coverage
